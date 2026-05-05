@@ -30,15 +30,23 @@
         <java.version>26</java.version>
     </properties>
     <dependencies>
+        <!-- Core Spring Boot starter: provides auto-configuration, logging, and YAML support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Test: provides JUnit 5, Mockito, AssertJ, and Spring Test utilities for unit and integration testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Web: provides Spring MVC, embedded Tomcat, and RESTful API support -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
 
