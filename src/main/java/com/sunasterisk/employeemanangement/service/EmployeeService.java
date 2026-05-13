@@ -1,80 +1,112 @@
 package com.sunasterisk.employeemanangement.service;
 
 import com.sunasterisk.employeemanangement.dto.EmployeeRequest;
+import com.sunasterisk.employeemanangement.exception.ResourceNotFoundException;
+import com.sunasterisk.employeemanangement.model.Department;
 import com.sunasterisk.employeemanangement.model.Employee;
+import com.sunasterisk.employeemanangement.repository.DepartmentRepository;
+import com.sunasterisk.employeemanangement.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.time.LocalDate;
 
 @Service
 public class EmployeeService {
 
-    // In-memory storage
-    private final List<Employee> employees = new ArrayList<>();
-
+    private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
     private final UtilityService utilityService;
 
-    public EmployeeService(UtilityService utilityService) {
+    public EmployeeService(EmployeeRepository employeeRepository,
+                           DepartmentRepository departmentRepository,
+                           UtilityService utilityService) {
+        this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
         this.utilityService = utilityService;
-
-        // Khởi tạo một số nhân viên mẫu
-        employees.add(new Employee(
-                utilityService.generateEmployeeCode(),
-                utilityService.formatFullName("nguyen van an"),
-                "an.nguyen@company.com", "0912345678",
-                "Engineering", "Backend Developer",
-                15_000_000, LocalDate.of(2022, 3, 1)
-        ));
-        employees.add(new Employee(
-                utilityService.generateEmployeeCode(),
-                utilityService.formatFullName("tran thi bich"),
-                "bich.tran@company.com", "0987654321",
-                "Design", "UI/UX Designer",
-                12_000_000, LocalDate.of(2023, 6, 15)
-        ));
-        employees.add(new Employee(
-                utilityService.generateEmployeeCode(),
-                utilityService.formatFullName("le minh hoang"),
-                "hoang.le@company.com", "0901122334",
-                "Engineering", "Frontend Developer",
-                13_500_000, LocalDate.of(2021, 9, 10)
-        ));
     }
 
     /**
-     * Lấy toàn bộ danh sách nhân viên.
+     * GET /api/employees – Lấy tất cả nhân viên
      */
     public List<Employee> getAllEmployees() {
-        return Collections.unmodifiableList(employees);
+        return employeeRepository.findAll();
     }
 
     /**
-     * Thêm nhân viên mới vào danh sách.
+     * GET /api/employees/{id} – Lấy nhân viên theo ID
+     */
+    public Employee getEmployeeById(Long id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+    }
+
+    /**
+     * Get /api/employees?name={} - Lấy danh sách nhân viên theo tên
+     */
+    public List<Employee> getEmployeesByName(String name) {
+        return employeeRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    /**
+     * GET /api/employees?departmentName={} - Lấy danh sách nhân viên theo departmentName
+     */
+    public List<Employee> getEmployeesByDepartmentName(String departmentName) {
+        return employeeRepository.findByDepartmentNameContainingIgnoreCase(departmentName);
+    }
+
+    /**
+     * POST /api/employees – Tạo nhân viên mới
      */
     public Employee createEmployee(EmployeeRequest request) {
-        // Kiểm tra email trùng
-        boolean emailExists = employees.stream()
-                .anyMatch(e -> e.getEmail().equalsIgnoreCase(request.getEmail()));
-        if (emailExists) {
+        if (employeeRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new IllegalArgumentException("Email already exists: " + request.getEmail());
         }
 
-        // Map DTO → model, tạo object mới thay vì mutate
-        Employee newEmployee = new Employee(
-                utilityService.generateEmployeeCode(),
-                utilityService.formatFullName(request.getFullName()),
-                request.getEmail(),
-                request.getPhoneNumber(),
-                request.getDepartment(),
-                request.getPosition(),
-                request.getSalary(),
-                request.getHireDate()
-        );
+        Department department = resolveDepartment(request.getDepartmentId());
 
-        employees.add(newEmployee);
-        return newEmployee;
+        Employee employee = new Employee();
+        employee.setName(utilityService.formatFullName(request.getName()));
+        employee.setEmail(request.getEmail());
+        employee.setDepartment(department);
+
+        return employeeRepository.save(employee);
+    }
+
+    /**
+     * PUT /api/employees/{id} – Cập nhật nhân viên
+     */
+    public Employee updateEmployee(Long id, EmployeeRequest request) {
+        Employee employee = getEmployeeById(id);
+
+        // Nếu email thay đổi, kiểm tra trùng lặp
+        if (!employee.getEmail().equalsIgnoreCase(request.getEmail())
+                && employeeRepository.existsByEmailIgnoreCase(request.getEmail())) {
+            throw new IllegalArgumentException("Email already exists: " + request.getEmail());
+        }
+
+        Department department = resolveDepartment(request.getDepartmentId());
+
+        employee.setName(utilityService.formatFullName(request.getName()));
+        employee.setEmail(request.getEmail());
+        employee.setDepartment(department);
+
+        return employeeRepository.save(employee);
+    }
+
+    /**
+     * DELETE /api/employees/{id} – Xóa nhân viên
+     */
+    public void deleteEmployee(Long id) {
+        Employee employee = getEmployeeById(id);
+        employeeRepository.delete(employee);
+    }
+
+    /**
+     * Tìm Department theo ID (nullable)
+     */
+    private Department resolveDepartment(Long departmentId) {
+        if (departmentId == null) return null;
+        return departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Department", departmentId));
     }
 }

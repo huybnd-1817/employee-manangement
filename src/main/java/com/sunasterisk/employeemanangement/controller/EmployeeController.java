@@ -22,8 +22,7 @@ public class EmployeeController {
     }
 
     /**
-     * Lấy danh sách tất cả nhân viên.
-     * GET /employees
+     * GET /api/employees
      */
     @GetMapping
     public ResponseEntity<List<Employee>> getAllEmployees() {
@@ -31,8 +30,31 @@ public class EmployeeController {
     }
 
     /**
-     * Thêm nhân viên mới.
-     * POST /employees
+     * GET /api/employees/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+        return ResponseEntity.ok(employeeService.getEmployeeById(id));
+    }
+
+    /**
+     * GET /api/employees?name={}
+     */
+    @GetMapping(params = "name")
+    public ResponseEntity<List<Employee>> getEmployeesByName(@RequestParam String name) {
+        return ResponseEntity.ok(employeeService.getEmployeesByName(name));
+    }
+
+    /**
+     * Get /api/employees?departmentName={}
+     */
+    @GetMapping(params = "departmentName")
+    public ResponseEntity<List<Employee>> getEmployeesByDepartmentName(@RequestParam String departmentName) {
+        return ResponseEntity.ok(employeeService.getEmployeesByDepartmentName(departmentName));
+    }
+
+    /**
+     * POST /api/employees
      */
     @PostMapping
     public ResponseEntity<Employee> createEmployee(@Valid @RequestBody EmployeeRequest request) {
@@ -43,5 +65,23 @@ public class EmployeeController {
                 .buildAndExpand(created.getId())
                 .toUri();
         return ResponseEntity.created(location).body(created);
+    }
+
+    /**
+     * PUT /api/employees/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id,
+                                                   @Valid @RequestBody EmployeeRequest request) {
+        return ResponseEntity.ok(employeeService.updateEmployee(id, request));
+    }
+
+    /**
+     * DELETE /api/employees/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+        employeeService.deleteEmployee(id);
+        return ResponseEntity.noContent().build();
     }
 }
