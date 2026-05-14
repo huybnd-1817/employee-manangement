@@ -6,12 +6,16 @@ import com.sunasterisk.employeemanangement.model.Department;
 import com.sunasterisk.employeemanangement.model.Employee;
 import com.sunasterisk.employeemanangement.repository.DepartmentRepository;
 import com.sunasterisk.employeemanangement.repository.EmployeeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class EmployeeService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmployeeService.class);
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
@@ -77,7 +81,10 @@ public class EmployeeService {
      * POST /api/employees – Tạo nhân viên mới
      */
     public Employee createEmployee(EmployeeRequest request) {
+        log.info("Creating employee with email: {}", request.getEmail());
+
         if (employeeRepository.existsByEmailIgnoreCase(request.getEmail())) {
+            log.warn("Create failed – email already exists: {}", request.getEmail());
             throw new IllegalArgumentException("Email already exists: " + request.getEmail());
         }
 
@@ -88,18 +95,23 @@ public class EmployeeService {
         employee.setEmail(request.getEmail());
         employee.setDepartment(department);
 
-        return employeeRepository.save(employee);
+        Employee saved = employeeRepository.save(employee);
+        log.info("Employee created successfully – id={}, name={}, email={}", saved.getId(), saved.getName(), saved.getEmail());
+        return saved;
     }
 
     /**
      * PUT /api/employees/{id} – Cập nhật nhân viên
      */
     public Employee updateEmployee(Long id, EmployeeRequest request) {
+        log.info("Updating employee id={}", id);
+
         Employee employee = getEmployeeById(id);
 
         // Nếu email thay đổi, kiểm tra trùng lặp
         if (!employee.getEmail().equalsIgnoreCase(request.getEmail())
                 && employeeRepository.existsByEmailIgnoreCase(request.getEmail())) {
+            log.warn("Update failed – email already exists: {}", request.getEmail());
             throw new IllegalArgumentException("Email already exists: " + request.getEmail());
         }
 
@@ -109,7 +121,9 @@ public class EmployeeService {
         employee.setEmail(request.getEmail());
         employee.setDepartment(department);
 
-        return employeeRepository.save(employee);
+        Employee updated = employeeRepository.save(employee);
+        log.info("Employee updated successfully – id={}, name={}, email={}", updated.getId(), updated.getName(), updated.getEmail());
+        return updated;
     }
 
     /**
@@ -117,7 +131,9 @@ public class EmployeeService {
      */
     public void deleteEmployee(Long id) {
         Employee employee = getEmployeeById(id);
+        log.info("Deleting employee – id={}, name={}, email={}", employee.getId(), employee.getName(), employee.getEmail());
         employeeRepository.delete(employee);
+        log.info("Employee deleted successfully – id={}", id);
     }
 
     /**

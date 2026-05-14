@@ -1,0 +1,27 @@
+# =============================================
+# Profile: DEV
+# Dùng khi chạy local, show SQL, tự cập nhật schema
+# =============================================
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/employee-management-system
+    username: nguyen.duc.huyb
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: update       # tự động tạo/cập nhật bảng theo Entity
+    show-sql: true           # in câu SQL ra console
+    properties:
+      hibernate:
+        format_sql: true     # format SQL đẹp hơn
+
+logging:
+  level:
+    root: INFO
+    com.sunasterisk.employeemanangement: DEBUG   # log chi tiết package chính
+    org.hibernate.SQL: DEBUG                     # log SQL từ Hibernate
+    org.hibernate.orm.jdbc.bind: TRACE           # log giá trị bind parameter
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
