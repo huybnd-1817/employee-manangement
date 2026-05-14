@@ -1,0 +1,27 @@
+# =============================================
+# Profile: PROD
+# Dùng khi deploy production – bảo mật, không show SQL
+# Cấu hình qua biến môi trường:
+#   DB_URL, DB_USERNAME, DB_PASSWORD
+# =============================================
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://prod-db-host:5432/employee_prod}
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: validate     # chỉ validate schema, không tự thay đổi
+    show-sql: false       # không in câu SQL ra console ở prod
+    properties:
+      hibernate:
+        format_sql: false
+logging:
+  level:
+    root: WARN
+    com.sunasterisk.employeemanangement: INFO    # chỉ log INFO trở lên ở prod
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/employee-management.log           # ghi log ra file
