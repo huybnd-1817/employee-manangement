@@ -55,6 +55,25 @@ public class EmployeeService {
     }
 
     /**
+     * Tìm kiếm nhân viên theo name hoặc departmentName (dùng cho trang web).
+     * Nếu cả hai đều trống, trả về toàn bộ danh sách.
+     */
+    public List<Employee> search(String name, String departmentName) {
+        boolean hasName = name != null && !name.isBlank();
+        boolean hasDept = departmentName != null && !departmentName.isBlank();
+
+        if (hasName && hasDept) {
+            return employeeRepository.findByNameContainingIgnoreCaseAndDepartmentNameContainingIgnoreCase(name, departmentName);
+        } else if (hasName) {
+            return employeeRepository.findByNameContainingIgnoreCase(name);
+        } else if (hasDept) {
+            return employeeRepository.findByDepartmentNameContainingIgnoreCase(departmentName);
+        } else {
+            return employeeRepository.findAll();
+        }
+    }
+
+    /**
      * POST /api/employees – Tạo nhân viên mới
      */
     public Employee createEmployee(EmployeeRequest request) {

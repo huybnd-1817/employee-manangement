@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Danh sách nhân viên</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6fa; color: #333; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        h1 { font-size: 1.8rem; margin-bottom: 24px; color: #2c3e50; }
+
+        /* Search form */
+        .search-form {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            background: #fff; padding: 20px; border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 24px;
+        }
+        .search-form input {
+            flex: 1 1 200px; padding: 9px 14px; border: 1px solid #ccc;
+            border-radius: 6px; font-size: .95rem;
+        }
+        .search-form button {
+            padding: 9px 22px; border: none; border-radius: 6px;
+            background: #3498db; color: #fff; cursor: pointer; font-size: .95rem;
+        }
+        .search-form button:hover { background: #2980b9; }
+        .btn-reset {
+            padding: 9px 22px; border: 1px solid #bbb; border-radius: 6px;
+            background: #fff; color: #555; cursor: pointer; font-size: .95rem;
+            text-decoration: none; display: inline-flex; align-items: center;
+        }
+        .btn-reset:hover { background: #f0f0f0; }
+
+        /* Actions bar */
+        .actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .btn-add {
+            padding: 9px 22px; background: #27ae60; color: #fff;
+            border-radius: 6px; text-decoration: none; font-size: .95rem;
+        }
+        .btn-add:hover { background: #219a52; }
+        .result-count { font-size: .9rem; color: #666; }
+
+        /* Alert */
+        .alert-success {
+            background: #d4edda; color: #155724; padding: 12px 18px;
+            border-radius: 6px; margin-bottom: 20px; border: 1px solid #c3e6cb;
+        }
+
+        /* Table */
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #2c3e50; color: #fff; }
+        th, td { padding: 12px 16px; text-align: left; font-size: .93rem; }
+        tbody tr:nth-child(even) { background: #f9f9f9; }
+        tbody tr:hover { background: #eaf4fb; }
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 12px;
+            background: #d6eaf8; color: #1a6fa0; font-size: .82rem;
+        }
+        .badge-none { background: #eee; color: #888; }
+        .empty-msg { text-align: center; padding: 40px; color: #999; font-size: 1rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>👥 Danh sách nhân viên</h1>
+
+    <!-- Flash message after successful add -->
+    <div class="alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+    <!-- Search form -->
+    <form class="search-form" method="get" th:action="@{/employees/list}">
+        <input type="text" name="name" placeholder="🔍 Tìm theo tên nhân viên..."
+               th:value="${searchName}"/>
+        <input type="text" name="departmentName" placeholder="🏢 Tìm theo tên phòng ban..."
+               th:value="${searchDepartment}"/>
+        <button type="submit">Tìm kiếm</button>
+        <a class="btn-reset" th:href="@{/employees/list}">Xoá bộ lọc</a>
+    </form>
+
+    <!-- Actions bar -->
+    <div class="actions">
+        <span class="result-count"
+              th:text="${employees.size()} + ' nhân viên được tìm thấy'"></span>
+        <a class="btn-add" th:href="@{/employees/add}">+ Thêm nhân viên</a>
+    </div>
+
+    <!-- Employee table -->
+    <div class="table-wrap">
+        <table th:if="${!employees.isEmpty()}">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Phòng ban</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="emp, stat : ${employees}">
+                <td th:text="${stat.index + 1}"></td>
+                <td th:text="${emp.name}"></td>
+                <td th:text="${emp.email}"></td>
+                <td>
+                    <span th:if="${emp.department != null}"
+                          class="badge"
+                          th:text="${emp.department.name}"></span>
+                    <span th:unless="${emp.department != null}"
+                          class="badge badge-none">Chưa phân công</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty-msg" th:if="${employees.isEmpty()}">
+            Không tìm thấy nhân viên nào phù hợp.
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

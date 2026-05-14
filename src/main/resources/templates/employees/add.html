@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Them nhan vien moi</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f6fa; color: #333; }
+        .container { max-width: 600px; margin: 50px auto; padding: 0 20px; }
+        h1 { font-size: 1.7rem; margin-bottom: 28px; color: #2c3e50; }
+        .card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); padding: 32px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: .95rem; }
+        input[type="text"], input[type="email"], select { width: 100%; padding: 10px 14px; border: 1px solid #ccc; border-radius: 6px; font-size: .95rem; }
+        input:focus, select:focus { outline: none; border-color: #3498db; }
+        .field-error { color: #e74c3c; font-size: .85rem; margin-top: 5px; }
+        .input-error { border-color: #e74c3c !important; }
+        .alert-error { background: #fde8e8; color: #a61c00; padding: 12px 18px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #f5c6c6; }
+        .btn-row { display: flex; gap: 12px; margin-top: 28px; }
+        .btn-submit { flex: 1; padding: 11px; background: #27ae60; color: #fff; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        .btn-submit:hover { background: #219a52; }
+        .btn-back { flex: 1; padding: 11px; background: #fff; color: #555; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; text-align: center; text-decoration: none; }
+        .btn-back:hover { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Them nhan vien moi</h1>
+    <div class="card">
+        <div class="alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        <form method="post" th:action="@{/employees/add}" th:object="${employeeRequest}" novalidate>
+            <div class="form-group">
+                <label for="name">Ho ten *</label>
+                <input type="text" id="name" th:field="*{name}"
+                       th:classappend="${#fields.hasErrors('name')} ? 'input-error'"
+                       placeholder="Nhap ho va ten nhan vien"/>
+                <div class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" th:field="*{email}"
+                       th:classappend="${#fields.hasErrors('email')} ? 'input-error'"
+                       placeholder="example@company.com"/>
+                <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+            <div class="form-group">
+                <label for="departmentId">Phong ban</label>
+                <select id="departmentId" th:field="*{departmentId}">
+                    <option value="">-- Chon phong ban (tuy chon) --</option>
+                    <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}"></option>
+                </select>
+            </div>
+            <div class="btn-row">
+                <a class="btn-back" th:href="@{/employees/list}">Quay lai</a>
+                <button type="submit" class="btn-submit">Luu nhan vien</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

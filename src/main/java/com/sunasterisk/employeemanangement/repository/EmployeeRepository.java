@@ -27,4 +27,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
      * Tìm danh sách nhân viên theo department.
      */
     List<Employee> findByDepartmentNameContainingIgnoreCase(String departmentName);
+
+    /**
+     * Tìm danh sách nhân viên theo name VÀ department.
+     */
+    List<Employee> findByNameContainingIgnoreCaseAndDepartmentNameContainingIgnoreCase(
+            String name, String departmentName);
 }
