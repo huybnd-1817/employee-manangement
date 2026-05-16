@@ -1,7 +1,7 @@
 package com.sunasterisk.employeemanangement.controller;
 
-import com.sunasterisk.employeemanangement.config.FakePasswordEncoder;
 import com.sunasterisk.employeemanangement.service.UtilityService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
 
     private final UtilityService utilityService;
-    private final FakePasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public HelloController(UtilityService utilityService, FakePasswordEncoder passwordEncoder) {
+    public HelloController(UtilityService utilityService, PasswordEncoder passwordEncoder) {
         this.utilityService = utilityService;
         this.passwordEncoder = passwordEncoder;
     }
