@@ -6,7 +6,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/employee-management-system
     username: nguyen.duc.huyb
-    password: ""
+    password: "dev123"
 
   jpa:
     hibernate:
