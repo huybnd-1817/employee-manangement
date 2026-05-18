@@ -21,12 +21,18 @@ public class CacheConfig {
     public static final String EMPLOYEE_COUNT_CACHE = "employeeCount";
 
     /**
+     * Tên cache dùng cho thống kê số lượng nhân viên theo phòng ban.
+     */
+    public static final String EMPLOYEE_DEPT_STATS_CACHE = "employeeDeptStats";
+
+    /**
      * CacheManager sử dụng Caffeine với TTL 1 phút.
      * Sau 1 phút kể từ lần ghi cuối, entry sẽ tự động hết hạn.
      */
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager manager = new CaffeineCacheManager(EMPLOYEE_COUNT_CACHE);
+        CaffeineCacheManager manager = new CaffeineCacheManager(
+                EMPLOYEE_COUNT_CACHE, EMPLOYEE_DEPT_STATS_CACHE);
         manager.setCaffeine(
                 Caffeine.newBuilder()
                         .expireAfterWrite(1, TimeUnit.MINUTES)

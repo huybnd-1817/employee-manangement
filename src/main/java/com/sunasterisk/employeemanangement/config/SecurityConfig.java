@@ -61,8 +61,15 @@ public class SecurityConfig {
                         // Cho phép tất cả truy cập vào endpoint đăng ký / đăng nhập
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // USER + ADMIN được xem danh sách nhân viên (GET)
+                        // Trang Thymeleaf công khai — không cần đăng nhập
+                        .requestMatchers("/employees/**").permitAll()
+
+                        // USER + ADMIN được xem thống kê (GET)
+                        .requestMatchers(HttpMethod.GET, "/api/stats/**").hasAnyRole("USER", "ADMIN")
+
+                        // USER + ADMIN được xem danh sách nhân viên & thống kê (GET)
                         .requestMatchers(HttpMethod.GET, "/api/employees/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/stats/**").hasAnyRole("USER", "ADMIN")
 
                         // Chỉ ADMIN được tạo / sửa / xoá nhân viên (POST, PUT, DELETE)
                         .requestMatchers(HttpMethod.POST, "/api/employees/**").hasRole("ADMIN")
