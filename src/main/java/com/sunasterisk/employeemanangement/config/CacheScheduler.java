@@ -21,6 +21,14 @@ public class CacheScheduler {
     }
 
     /**
+     * Manually evict the "employeeDeptStats" cache on demand.
+     */
+    @CacheEvict(value = CacheConfig.EMPLOYEE_DEPT_STATS_CACHE, allEntries = true)
+    public void evictEmployeeDeptStatsCache() {
+        log.debug("Cache '{}' manually evicted", CacheConfig.EMPLOYEE_DEPT_STATS_CACHE);
+    }
+
+    /**
      * Logs "System running" to console every 30 seconds.
      */
     @Scheduled(fixedRate = 30_000)

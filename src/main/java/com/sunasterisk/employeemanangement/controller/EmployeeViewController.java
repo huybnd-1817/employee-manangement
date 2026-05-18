@@ -4,6 +4,7 @@ import com.sunasterisk.employeemanangement.dto.EmployeeRequest;
 import com.sunasterisk.employeemanangement.model.Employee;
 import com.sunasterisk.employeemanangement.service.DepartmentService;
 import com.sunasterisk.employeemanangement.service.EmployeeService;
+import com.sunasterisk.employeemanangement.service.EmployeeStatsService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,11 +23,14 @@ public class EmployeeViewController {
 
     private final EmployeeService employeeService;
     private final DepartmentService departmentService;
+    private final EmployeeStatsService employeeStatsService;
 
     public EmployeeViewController(EmployeeService employeeService,
-                                  DepartmentService departmentService) {
+                                  DepartmentService departmentService,
+                                  EmployeeStatsService employeeStatsService) {
         this.employeeService = employeeService;
         this.departmentService = departmentService;
+        this.employeeStatsService = employeeStatsService;
     }
 
     // =========================================================
@@ -83,6 +87,18 @@ public class EmployeeViewController {
             return "employees/add";
         }
     }
+
+    // =========================================================
+    // GET /employees/statistics  – Hiển thị trang thống kê
+    // =========================================================
+    @GetMapping("/statistics")
+    public String showStatistics(Model model) {
+        long totalCount = employeeStatsService.getEmployeeCount();
+        var deptStats = employeeStatsService.getEmployeeCountByDepartment();
+
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("deptStats", deptStats);
+
+        return "employees/statistics"; // templates/employees/statistics.html
+    }
 }
-
-
